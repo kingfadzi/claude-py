@@ -118,76 +118,143 @@ Execute these phases in strict order. STOP and wait for user input where indicat
 
 ## PHASE 1: ASSESS (read-only)
 
+**CRITICAL ENFORCEMENT RULES:**
+1. Use TodoWrite to create a todo item for EACH of the 10 assessment categories
+2. Mark each category as completed ONLY after documenting ALL sub-items
+3. For EVERY sub-item, you MUST provide either specific findings OR explicitly state "None found"
+4. Empty/missing sections are NOT acceptable - every cell in the tables below must be filled
+
 Scan the repository without making any changes:
 
-1. **Project Structure Analysis**
-   - Check for src/ layout vs flat layout
-   - Identify test directories (tests/, test/)
-   - Look for config files (pyproject.toml, setup.py, setup.cfg, requirements*.txt)
-   - Check for proper __init__.py files
-   - Flag generic folders (utils/, helpers/, common/, shared/)
+### 1. Project Structure Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| Layout type | [src/ / flat / other] | |
+| Test directories | [found: X / none] | [list paths] |
+| Config files | [list found] | |
+| __init__.py files | [proper / missing: X] | [list missing] |
+| Generic folders flagged | [none / list found] | utils/, helpers/, common/, shared/ |
 
-2. **Dependency Analysis**
-   - Identify dependency management method (pyproject.toml, requirements.txt, setup.py)
-   - Check for pinned versions vs unpinned
-   - Look for outdated dependencies
-   - Identify unused dependencies if possible
-   - Check for security vulnerabilities (note: suggest pip-audit)
+### 2. Dependency Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| Management method | [pyproject.toml / requirements.txt / setup.py / none] | |
+| Version pinning | [pinned / unpinned / mixed] | |
+| Outdated deps | [none / list] | |
+| Unused deps | [none / list / unable to determine] | |
+| Security vulnerabilities | [none found / list / suggest pip-audit] | |
 
-3. **Security Scan**
-   - Search for hardcoded secrets (API keys, passwords, tokens)
-   - Check for .env files committed to git
-   - Look for unsafe patterns (eval, exec, shell=True)
-   - Review .gitignore for sensitive file patterns
+### 3. Security Scan
+| Check | Result | Details |
+|-------|--------|---------|
+| Hardcoded secrets | [none / FOUND: list with file:line] | API keys, passwords, tokens |
+| .env in git | [not committed / COMMITTED] | |
+| Unsafe patterns | [none / FOUND: list with file:line] | eval, exec, shell=True |
+| .gitignore coverage | [adequate / missing: list] | |
 
-4. **Code Quality Scan**
-   - Identify files >200 lines
-   - Identify functions >50 lines
-   - Check for deep nesting (>3 levels)
-   - Look for code duplication patterns
-   - Check naming conventions (snake_case for functions/variables)
+### 4. Code Quality Scan
+| Check | Result | Details |
+|-------|--------|---------|
+| Files >200 lines | [none / list with line counts] | **MUST list each file** |
+| Files >300 lines | [none / list with line counts] | **MUST list each file** |
+| Functions >50 lines | [none / list with file:line and line count] | **MUST list each function** |
+| Deep nesting >3 levels | [none / list with file:line] | |
+| Code duplication | [none / describe patterns] | |
+| Naming conventions | [compliant / issues: list] | |
 
-5. **Testing Analysis**
-   - Check for pytest configuration
-   - Identify test files and coverage
-   - Look for conftest.py
-   - Check if tests are runnable
+**MANDATORY: Functions >50 lines table (if any exist):**
+| Function | File | Lines | Start:End |
+|----------|------|-------|-----------|
+| [name] | [file] | [count] | [start:end] |
 
-6. **Tooling Check**
-   - Check for ruff configuration
-   - Check for formatting configuration
-   - Look for pre-commit config
-   - Check for CI/CD configuration (.github/workflows, .gitlab-ci.yml, etc.)
+### 5. Testing Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| pytest configured | [yes / no] | |
+| Test files found | [count] | [list paths] |
+| conftest.py | [exists / missing] | |
+| Tests runnable | [yes / no / error: X] | |
 
-7. **Separation of Concerns Analysis**
-   - Flag files mixing SQL strings (>5 lines of SQL) with Python logic
-   - Flag files containing HTML/Jinja templates alongside Python code
-   - Flag files with embedded JavaScript or CSS
-   - Flag files with multiple unrelated classes (>2 classes with different responsibilities)
-   - Check if SQL is in separate .sql files or a queries module
-   - Check if templates are in templates/ directory
+### 6. Tooling Check
+| Check | Result | Details |
+|-------|--------|---------|
+| ruff configured | [yes / no] | |
+| Formatting config | [ruff / black / none] | |
+| pre-commit config | [exists / missing] | |
+| CI/CD config | [GitHub Actions / GitLab CI / other / none] | |
 
-8. **Code Complexity Analysis (SonarQube/CodeClimate Readiness)**
-   - Identify functions with high cyclomatic complexity (>10)
-   - Identify functions with high cognitive complexity (>15)
-   - Flag functions with too many parameters (>5)
-   - Flag deeply nested code (>3 levels)
-   - Check for code smells: long methods, large classes, feature envy
-   - Identify duplicate code blocks (>10 similar lines)
+### 7. Separation of Concerns Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| Embedded SQL >5 lines | [none / list files] | |
+| HTML/Jinja in Python | [none / list files] | |
+| JS/CSS in Python | [none / list files] | |
+| Multiple unrelated classes | [none / list files] | |
+| SQL externalized | [yes: path / no] | |
+| Templates in templates/ | [yes / no / N/A] | |
 
-9. **Test Coverage Analysis**
-   - Check if pytest-cov is configured
-   - Run coverage report if possible and note current percentage
-   - Identify files/modules with 0% coverage
-   - Identify critical paths without tests (e.g., main business logic)
-   - Check for test quality: are tests meaningful or just covering lines?
+### 8. Code Complexity Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| Cyclomatic complexity >10 | [none / list with file:line] | |
+| Cognitive complexity >15 | [none / list with file:line] | |
+| Functions >5 parameters | [none / list with file:line] | |
+| Nesting >3 levels | [none / list with file:line] | |
+| Duplicate code >10 lines | [none / describe] | |
 
-10. **CI/CD Pipeline Analysis**
-    - Check for .gitlab-ci.yml or .github/workflows/*.yml
-    - Verify pipeline includes: lint, test, coverage stages
-    - Check if coverage thresholds are enforced
-    - Check for security scanning (bandit, safety, pip-audit)
-    - Check for Docker/container configuration if applicable
+**MANDATORY: Long/complex functions table (if any exist):**
+| Function | File:Line | Lines | Params | Issue |
+|----------|-----------|-------|--------|-------|
+| [name] | [file:line] | [count] | [count] | [>50 lines / >5 params / high complexity] |
+
+### 9. Test Coverage Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| pytest-cov configured | [yes / no] | |
+| Current coverage | [X% / unknown / none] | |
+| Modules with 0% coverage | [none / list] | **MUST list each module** |
+| Critical paths untested | [none / list] | |
+| Test quality | [meaningful / superficial / N/A] | |
+
+### 10. CI/CD Pipeline Analysis
+| Check | Result | Details |
+|-------|--------|---------|
+| Pipeline file | [.gitlab-ci.yml / .github/workflows/*.yml / none] | |
+| Lint stage | [yes / no / N/A] | |
+| Test stage | [yes / no / N/A] | |
+| Coverage enforcement | [yes: X% / no / N/A] | |
+| Security scanning | [bandit / safety / pip-audit / none] | |
+| Docker config | [exists / none / N/A] | |
+
+---
+
+## PHASE 1 SELF-VERIFICATION (MANDATORY)
+
+**Before presenting the assessment report, you MUST verify:**
+
+```
+[ ] Category 1 (Project Structure): All 5 checks documented with results
+[ ] Category 2 (Dependencies): All 5 checks documented with results
+[ ] Category 3 (Security): All 4 checks documented with results
+[ ] Category 4 (Code Quality): All 6 checks documented with results
+    [ ] Listed ALL files >200 lines with exact line counts
+    [ ] Listed ALL files >300 lines with exact line counts
+    [ ] Listed ALL functions >50 lines with file:line and line counts
+[ ] Category 5 (Testing): All 4 checks documented with results
+[ ] Category 6 (Tooling): All 4 checks documented with results
+[ ] Category 7 (Separation of Concerns): All 6 checks documented with results
+[ ] Category 8 (Code Complexity): All 5 checks documented with results
+    [ ] Listed ALL functions with >5 parameters
+    [ ] Listed ALL functions with high cyclomatic complexity
+[ ] Category 9 (Test Coverage): All 5 checks documented with results
+    [ ] Listed ALL modules with 0% coverage
+[ ] Category 10 (CI/CD): All 6 checks documented with results
+
+STOP: Do NOT present the report until ALL boxes above can be checked.
+If any check shows "none" or "N/A", that is valid - but it MUST be explicitly stated.
+```
+
+---
 
 ### Assessment Output Format
 
@@ -200,19 +267,40 @@ Scan the repository without making any changes:
 - **Dependency Management**: [pyproject.toml/requirements.txt/setup.py/none]
 - **Test Framework**: [pytest/unittest/none detected]
 
+## Detailed Findings by Category
+
+[Include ALL 10 category tables from above with every cell filled]
+
+## Summary Tables
+
+### Files Exceeding Size Limits
+| File | Lines | Limit | Over By |
+|------|-------|-------|---------|
+| [file] | [count] | [200/300] | [X lines] |
+
+### Functions Exceeding Limits
+| Function | File:Line | Lines | Params | Issues |
+|----------|-----------|-------|--------|--------|
+| [name] | [file:line] | [count] | [count] | [list issues] |
+
+### Modules Needing Tests (0% coverage)
+| Module | Lines | Critical |
+|--------|-------|----------|
+| [module] | [count] | [yes/no] |
+
 ## Findings by Severity
 
 ### CRITICAL (Must Fix)
-- [ ] [Finding description with file:line reference]
+- [ ] [Finding ID]: [Description with file:line reference]
 
 ### HIGH (Should Fix)
-- [ ] [Finding description]
+- [ ] [Finding ID]: [Description]
 
 ### MEDIUM (Recommended)
-- [ ] [Finding description]
+- [ ] [Finding ID]: [Description]
 
 ### LOW (Nice to Have)
-- [ ] [Finding description]
+- [ ] [Finding ID]: [Description]
 
 ## Current State Summary
 | Category | Status | Notes |
@@ -227,6 +315,13 @@ Scan the repository without making any changes:
 | Code Complexity | [Good/High Complexity Found] | |
 | Test Coverage | [X%/Unknown/None] | |
 | CI/CD Pipeline | [Complete/Partial/Missing] | |
+
+## Finding Count Summary
+- CRITICAL: [X]
+- HIGH: [X]
+- MEDIUM: [X]
+- LOW: [X]
+- **TOTAL: [X]**
 ```
 
 **STOP HERE** - Present the assessment report and wait for user to review before proceeding.
@@ -253,7 +348,14 @@ After user reviews assessment, create specific action plan:
 ```markdown
 # Proposed Changes
 
+## Finding Coverage Verification
+- Total findings from Phase 1: [X]
+- Proposals created: [X]
+- Explicitly deferred: [X]
+- **Accounted for: [X] (must equal total findings)**
+
 ## Change 1: [Title]
+**Addresses findings**: [list finding IDs from Phase 1]
 **Severity**: [CRITICAL/HIGH/MEDIUM/LOW]
 **Files affected**: [list]
 **What will change**:
@@ -266,8 +368,9 @@ After user reviews assessment, create specific action plan:
 ...
 
 ## Deferred Items (with reasons)
-- [Finding X]: Deferred because [reason]
-- [Finding Y]: Requires user decision on [specific choice]
+| Finding ID | Description | Reason for Deferral |
+|------------|-------------|---------------------|
+| [ID] | [desc] | [reason] |
 ```
 
 ### Proposal Completeness Checklist
@@ -636,6 +739,9 @@ After all approved changes are applied:
 9. **ALWAYS preserve existing patterns** - Match the repo's conventions unless they're problematic
 10. **ALWAYS explain why** - Every proposed change needs a clear reason
 11. **ALWAYS address ALL findings** - Every finding from Phase 1 must have a proposal OR be explicitly listed as deferred with a reason. No findings should be silently dropped.
+12. **ALWAYS fill every table cell** - No empty cells in assessment tables. Use "None found", "N/A", or explicit values.
+13. **ALWAYS list specific items** - When findings exist (files >200 lines, functions >50 lines, etc.), list EACH ONE with exact details, not just counts.
+14. **ALWAYS complete self-verification** - Do NOT present the Phase 1 report until the self-verification checklist is complete.
 </important_rules>
 
 <anti_patterns_to_flag>
@@ -672,4 +778,3 @@ After all approved changes are applied:
 </anti_patterns_to_flag>
 
 Begin by asking the user to confirm the repository to analyze, then proceed with Phase 1 Assessment.
-
