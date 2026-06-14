@@ -1,103 +1,50 @@
-# Claude Code Commands for Python PoC's
+# claude-py — Python/Django Claude Code Skills
 
-This repository contains specialized Claude Code agent prompts designed to systematically build proof of concept applications using Python. These agents work together to analyze requirements, design architecture, and implement complete working systems.
+A library of [Claude Code **Skills**](https://docs.claude.com/en/docs/claude-code/skills) for writing and reviewing idiomatic, modern Python (3.12/3.13) and Django applications. Each skill is a focused, single-responsibility reference that Claude auto-invokes when relevant — covering language idioms, code quality, architecture, and the Django web stack.
 
-## Overview
+Ported from and structured identically to [`claude-spring`](https://gitlab01.butterflycluster.com/staging/claude-spring) (its Java/Spring counterpart): frontmatter with explicit "Use when" triggers, BAD/GOOD code examples, severity tables, and cross-references between skills.
 
-These agent commands provide a structured approach to software development, taking you from initial requirements to a working proof of concept through a series of specialized agents:
+## Install
 
-1. **Problem Analysis** - Deep requirements understanding and problem decomposition
-2. **Architecture Design** - Comprehensive system design and technology selection
-3. **Task Breakdown** - Converting architecture into actionable implementation tasks
-4. **Detailed Planning** - Step-by-step implementation guides
-5. **Implementation** - Systematic code development and testing
+Copy the skills into a project (or your user scope):
 
-## Usage
-
-To use these agents, start with your requirements and trigger the software architect agent:
-
-```
-I want you to implement a basic clone of <X> called "<X-poc>". It allows <your features here>.
-
-In terms of tech stack use python on the server, and for the frontend i want you to use react.
-For design use tailwind but make sure to make nice components too so it's not a mess.
+```bash
+cp -r .claude/skills/* <your-project>/.claude/skills/
+# or for all projects:
+cp -r .claude/skills/* ~/.claude/skills/
 ```
 
-Then trigger the main orchestrator:
+Claude Code discovers each `SKILL.md` via its frontmatter and invokes it automatically when the work matches the skill's "Use when" description. No slash command needed.
 
-```
-/software_architect_agent
-```
+## Skills
 
-## Agent Commands
+### Language & code quality
+- **modern-python** — Python 3.12/3.13 idioms: type params, `match`, dataclasses, pathlib, walrus
+- **efficient-python** — right data structures, eliminating nested loops, generators, guard clauses
+- **flatten-nesting** — kill arrow code: guard clauses, early returns, lookup maps, extract-method
+- **readable-comprehensions** — comprehension/lambda readability; when to extract a named function
+- **concise-comments** — comments justify *why*, never restate *what*
+- **exception-handling** — exception hierarchies, narrow catches, error responses, logging strategy
+- **logging-observability** — stdlib logging + structlog, JSON logs, correlation IDs, OpenTelemetry
+- **python-concurrency** — asyncio, the GIL, threads vs processes, `concurrent.futures`, `TaskGroup`
+- **leverage-libraries** — battle-tested libraries over hand-rolled code
+- **design-patterns** — common patterns in idiomatic Python
+- **solid-principles** — SOLID with Python examples
+- **clean-architecture** — package-by-feature, hexagonal/ports-and-adapters, DDD, import-linter
+- **refactoring-python** — size-based triggers, extract method/class, parameter objects, modernization
+- **review-changes-python** — systematic Python/Django code-review workflow
+- **testing-python** — pytest, pytest-django, fixtures, factory_boy, mocking, Testcontainers
 
-### Core Agents
+### Django web stack
+- **django-configuration** — settings per environment, django-environ / pydantic-settings, secrets, feature flags
+- **django-orm** — models, QuerySets, avoiding N+1 (`select_related`/`prefetch_related`), migrations, transactions
+- **django-rest-api** — DRF serializers, viewsets, routers, pagination, versioning, thin views
+- **django-security** — auth backends, permissions, JWT/OAuth2, CSRF, CORS, password hashing, hardening
 
-- **`software_architect_agent`** - Main orchestrator that coordinates the entire development process
-- **`problem_analysis_agent`** - Analyzes requirements and creates comprehensive problem statements
-- **`architecture_design_agent`** - Designs system architecture and selects technologies
-- **`task_breakdown_agent`** - Breaks down architecture into implementation phases
-- **`detailed_planning_agent`** - Creates detailed step-by-step implementation plans
-- **`implementation_agent`** - Executes implementation following the plans
-- **`documentation_agent`** - Creates comprehensive project documentation
+## Conventions
 
-### Supporting Agents
-
-- **`programming_lead_agent`** - Research lead for high-level research strategy and planning
-- **`research_subagent`** - Specialized research tasks and information gathering
-- **`citations_agent`** - Adds proper citations to research reports
-
-## Python-Focused Features
-
-These agents are specifically configured for Python development:
-
-- **Frameworks**: FastAPI, Django, Flask
-- **Testing**: pytest, unittest with comprehensive test strategies
-- **Code Quality**: black (formatting), ruff (linting), mypy (type checking)
-- **Package Management**: uv (preferred), poetry, conda
-- **Project Structure**: Standard Python project layout (src/, tests/, docs/)
-- **Database**: SQLAlchemy, Django ORM, migrations
-- **Deployment**: Docker, cloud services, uv virtual environments
-
-## Example Workflow
-
-1. **Start** with your project requirements
-2. **Trigger** `/software_architect_agent` to begin the process
-3. **Problem Analysis** - Agent analyzes and documents requirements
-4. **Architecture Design** - Agent creates comprehensive system design
-5. **Task Breakdown** - Agent creates implementation phases
-6. **Detailed Planning** - Agent creates step-by-step guides
-7. **Implementation** - Agents systematically build the system
-8. **Testing & Integration** - Continuous testing throughout development
-9. **Documentation** - Agent creates comprehensive project documentation
-
-## Key Principles
-
-- **Backend-First**: Database models → API endpoints → Frontend
-- **Incremental Development**: Build and test components progressively
-- **Python Best Practices**: PEP 8, type hints, proper project structure
-- **Proof of Concept Focus**: Prioritize core functionality over edge cases
-- **Systematic Approach**: Never skip phases or implement out of order
+Standard tooling referenced throughout: **uv** (deps), **ruff** (lint + format), **mypy** (types), **pytest** (tests).
 
 ## Credits
 
-Original agent prompts were inspired by and adapted from [vibe-minisentry](https://github.com/mitsuhiko/vibe-minisentry) by Armin Ronacher. As noted in the [project issues](https://github.com/mitsuhiko/vibe-minisentry/issues/1), these agent prompts were originally generated by Claude Code itself using Opus, taking research prompts as input and creating specialized prompts for expert software architects and engineers.
-
-This Python-focused version builds upon that foundation with Python-specific tooling, conventions, and best practices.
-
-## Requirements
-
-- Claude Code CLI
-- Python 3.9+
-- uv (recommended for fast package management)
-- Basic understanding of Python development
-
-## Getting Started
-
-1. Place these command files in your `.claude/commands/` directory
-2. Start Claude Code in your project directory
-3. Provide your project requirements
-4. Run `/software_architect_agent` to begin the systematic development process
-
-The agents will guide you through the entire development lifecycle, from requirements analysis to working proof of concept.
-
+Structure and approach ported from `claude-spring`. The original orchestration-style command prompts this repo started from were replaced wholesale by this skills library.
